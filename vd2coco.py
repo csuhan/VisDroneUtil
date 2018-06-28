@@ -2,7 +2,7 @@ import json
 import os
 from PIL import Image
 
-print('hi')
+# Change working directory to DET dataset path
 os.chdir(
     'E:\\VisDrone Dataset\\1 - Object Detection in Images\\VisDrone2018-DET-train')
 outfile = open('instances_val2017.json', 'w')
@@ -14,9 +14,13 @@ data['licenses'] = [{"url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
 images = []
 annotations = []
 imfiles = os.listdir('images')
-#imfiles = imfiles[4504:]
 index = 1
 anid = 1
+numTrunc = 0
+numOccul = 0
+# Number of objects that are neither truncated nor occluded
+numComplete = 0
+numType = [0] * 12
 for imf in imfiles:
     im = Image.open('images/'+imf)
     item = {}
@@ -31,12 +35,12 @@ for imf in imfiles:
     anfile = open('annotations/'+imf.replace('jpg', 'txt'))
     lines = anfile.readlines()
     for line in lines:
-        #print(line)
+        # print(line)
         if len(line) < 2:
             continue
         anitem = {'segmentations': [[]]}
         nums = [int(x) for x in line.split(',')]
-        if nums[4]==0:
+        if nums[4] == 0:
             continue
         anitem['area'] = nums[2]*nums[3]
         anitem['iscrowd'] = 0
@@ -47,9 +51,26 @@ for imf in imfiles:
         anid += 1
         anitem['trunc'] = nums[6]
         anitem['occlu'] = nums[7]
+        if nums[6] == 0 and nums[7] == 0:
+            numComplete += 1
+        if nums[6]
+        numType[nums[5]] += 1
         annotations.append(anitem)
     print(index)
     index += 1
 data['images'] = images
 data['annotations'] = annotations
-json.dump(data, outfile, indent=4)
+data['categories'] = [{'supercategory': 'person', 'id': 1, 'name': 'pedestrian'},
+                      {'supercategory': 'person', 'id': 2, 'name': 'people'},
+                      {'supercategory': 'sm_vehicle', 'id': 3, 'name': 'bicycle'},
+                      {'supercategory': 'lg_vehicle', 'id': 4, 'name': 'car'},
+                      {'supercategory': 'lg_vehicle', 'id': 5, 'name': 'van'},
+                      {'supercategory': 'lg_vehicle', 'id': 6, 'name': 'truck'},
+                      {'supercategory': 'sm_vehicle', 'id': 7, 'name': 'tricycle'},
+                      {'supercategory': 'sm_vehicle',
+                          'id': 8, 'name': 'awning-tricycle'},
+                      {'supercategory': 'lg_vehicle', 'id': 9, 'name': 'bus'},
+                      {'supercategory': 'sm_vehicle', 'id': 10, 'name': 'motor'}]
+print(numComplete/len(imfiles))
+print(numType)
+#json.dump(data, outfile, indent=4)
