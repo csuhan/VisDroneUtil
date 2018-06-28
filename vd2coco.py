@@ -17,7 +17,7 @@ imfiles = os.listdir('images')
 index = 1
 anid = 1
 numTrunc = 0
-numOccul = 0
+numOcclu = 0
 # Number of objects that are neither truncated nor occluded
 numComplete = 0
 numType = [0] * 12
@@ -53,7 +53,10 @@ for imf in imfiles:
         anitem['occlu'] = nums[7]
         if nums[6] == 0 and nums[7] == 0:
             numComplete += 1
-        if nums[6]
+        if nums[6] == 1:
+            numTrunc += 1
+        if nums[7] == 1:
+            numOcclu += 1
         numType[nums[5]] += 1
         annotations.append(anitem)
     print(index)
@@ -72,5 +75,7 @@ data['categories'] = [{'supercategory': 'person', 'id': 1, 'name': 'pedestrian'}
                       {'supercategory': 'lg_vehicle', 'id': 9, 'name': 'bus'},
                       {'supercategory': 'sm_vehicle', 'id': 10, 'name': 'motor'}]
 print(numComplete/len(imfiles))
+print(numTrunc/len(imfiles))
+print(numOcclu/len(imfiles))
 print(numType)
-#json.dump(data, outfile, indent=4)
+json.dump(data, outfile, indent=4)
