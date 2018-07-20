@@ -31,15 +31,15 @@ for vid in videoList:
         im = Image.open('sequences/'+vid+'/'+frame)
         item = {}
         item['license'] = 1
-        item['file_name'] = vid+'_'+frame
+        item['file_name'] = vid+'-'+frame
         item['coco_url'] = 'http://images.cocodataset.org/val2017/'+frame
         item['height'], item['width'] = im.size
         item['date_captured'] = '2013-11-15 00:09:17'
         item['flickr_url'] = ''
         item['id'] = videoIndex
         images.append(item)
-        shutil.copy2('sequences/'+vid+'/'+frame, 'coco/images/'+vid+'_'+frame)
-    annoFile = open('annotations/'+'txt')
+        shutil.copy2('sequences/'+vid+'/'+frame, 'coco/images/'+vid+'-'+frame)
+    annoFile = open('annotations/'+vid+'.txt')
     lines = annoFile.readlines()
     for line in lines:
         # print(line)
@@ -78,8 +78,8 @@ data['categories'] = [{'supercategory': 'person', 'id': 1, 'name': 'pedestrian'}
                           'id': 8, 'name': 'awning-tricycle'},
                       {'supercategory': 'lg_vehicle', 'id': 9, 'name': 'bus'},
                       {'supercategory': 'sm_vehicle', 'id': 10, 'name': 'motor'}]
-print(numComplete/len(imfiles))
-print(numTrunc/len(imfiles))
-print(numOcclu/len(imfiles))
+print(numComplete/anid)
+print(numTrunc/anid)
+print(numOcclu/anid)
 print(numType)
 json.dump(data, outfile, indent=4)
