@@ -5,8 +5,8 @@ import shutil
 
 # Change working directory to DET dataset path
 os.chdir(
-    '/media/yiran/New/VisDrone2018-MOT/VisDrone2018-MOT-train')
-outfile = open('coco/annotations/instances_train2015.json', 'w')
+    '/home/magus/dataset/VisDrone-Dataset/2-Object-Detection-in-Videos/VisDrone2018-VID-train')
+outfile = open('coco/annotations/instances_train2014.json', 'w')
 data = {}
 data['info'] = {"description": "COCO 2015 Dataset", "url": "http://cocodataset.org", "version": "1.0",
                 "year": 2015, "contributor": "COCO Consortium", "date_created": "2015/09/01"}
@@ -23,11 +23,16 @@ numOcclu = 0
 # Number of objects that are neither truncated nor occluded
 numComplete = 0
 numType = [0] * 12
+imageIndex = -1
+frameMap = {}
+frameStep = 8
 for vid in videoList:
     videoIndex += 1
     frameList = os.listdir('sequences/'+vid)
     frameList.sort()
-    for frame in frameList:
+    for i in xrange(0, len(frameList), frameStep):
+        frame = frameList[i]
+        imageIndex+=1
         im = Image.open('sequences/'+vid+'/'+frame)
         item = {}
         item['license'] = 1
@@ -36,7 +41,8 @@ for vid in videoList:
         item['height'], item['width'] = im.size
         item['date_captured'] = '2013-11-15 00:09:17'
         item['flickr_url'] = ''
-        item['id'] = videoIndex
+        item['id'] = imageIndex
+        frameMap[videoIndex*10000+i+1] = imageIndex
         images.append(item)
         shutil.copy2('sequences/'+vid+'/'+frame, 'coco/images/'+vid+'-'+frame)
     annoFile = open('annotations/'+vid+'.txt')
@@ -47,9 +53,11 @@ for vid in videoList:
             continue
         anitem = {'segmentations': [[]]}
         nums = [int(x) for x in line.split(',')]
+        if nums[0]%frameStep is not 0:
+            continue
         anitem['area'] = nums[4]*nums[5]
         anitem['iscrowd'] = 0
-        anitem['image_id'] = videoIndex *10000 + nums[0]
+        anitem['image_id'] = frameMap[videoIndex*10000+nums[0]]
         anitem['bbox'] = nums[2:6]
         anitem['category_id'] = nums[7]
         anitem['id'] = anid

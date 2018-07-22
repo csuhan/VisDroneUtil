@@ -2,10 +2,11 @@ import json
 import os
 from PIL import Image
 
+use_val = 1
 # Change working directory to DET dataset path
 os.chdir(
-    'E:\\VisDrone Dataset\\1 - Object Detection in Images\\VisDrone2018-DET-train')
-outfile = open('instances_val2017.json', 'w')
+    'E:\\VisDrone Dataset\\1 - Object Detection in Images\\VisDrone2018-DET-' + ('val' if use_val == 1 else 'train'))
+outfile = open('instances_val2014.json' if use_val == 1 else 'instances_val2014.json', 'w')
 data = {}
 data['info'] = {"description": "COCO 2017 Dataset", "url": "http://cocodataset.org", "version": "1.0",
                 "year": 2017, "contributor": "COCO Consortium", "date_created": "2017/09/01"}
@@ -74,8 +75,9 @@ data['categories'] = [{'supercategory': 'person', 'id': 1, 'name': 'pedestrian'}
                           'id': 8, 'name': 'awning-tricycle'},
                       {'supercategory': 'lg_vehicle', 'id': 9, 'name': 'bus'},
                       {'supercategory': 'sm_vehicle', 'id': 10, 'name': 'motor'}]
-print(numComplete/len(imfiles))
-print(numTrunc/len(imfiles))
-print(numOcclu/len(imfiles))
+print('Complete: ', numComplete/len(annotations))
+print('Truncated: ', numTrunc/len(annotations))
+print('Occluded: ', numOcclu/len(annotations))
+print(len(annotations))
 print(numType)
 json.dump(data, outfile, indent=4)
