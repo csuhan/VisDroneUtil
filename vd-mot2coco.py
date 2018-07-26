@@ -3,10 +3,16 @@ import os
 from PIL import Image
 import shutil
 
-# Change working directory to DET dataset path
-os.chdir(
-    '/home/magus/dataset/VisDrone-Dataset/2-Object-Detection-in-Videos/VisDrone2018-VID-train')
-outfile = open('coco/annotations/instances_train2014.json', 'w')
+
+dsDir = '/home/magus/dataset/VisDrone-Dataset/2-Object-Detection-in-Videos/VisDrone2018-VID-train/'
+# train set
+# dataType = 'train'
+# val set
+dataType = 'val'
+dataDir = '/home/magus/dataset/VisDrone-Dataset/2-Object-Detection-in-Videos/VisDrone2018-VID-'+dataType+'/'
+# Change working directory to COCO dataset path
+os.chdir(dsDir)
+outfile = open('coco/annotations/instances_'+dataType+'2014.json', 'w')
 data = {}
 data['info'] = {"description": "COCO 2015 Dataset", "url": "http://cocodataset.org", "version": "1.0",
                 "year": 2015, "contributor": "COCO Consortium", "date_created": "2015/09/01"}
@@ -14,7 +20,7 @@ data['licenses'] = [{"url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
                      "id": 1, "name": "Attribution-NonCommercial-ShareAlike License"}]
 images = []
 annotations = []
-videoList = os.listdir('sequences')
+videoList = os.listdir(dataDir+'sequences')
 videoList.sort()
 videoIndex = -1
 anid = 1
@@ -25,15 +31,15 @@ numComplete = 0
 numType = [0] * 12
 imageIndex = -1
 frameMap = {}
-frameStep = 8
+frameStep = 1
 for vid in videoList:
     videoIndex += 1
-    frameList = os.listdir('sequences/'+vid)
+    frameList = os.listdir(dataDir+'sequences/'+vid)
     frameList.sort()
     for i in xrange(0, len(frameList), frameStep):
         frame = frameList[i]
         imageIndex+=1
-        im = Image.open('sequences/'+vid+'/'+frame)
+        im = Image.open(dataDir+'sequences/'+vid+'/'+frame)
         item = {}
         item['license'] = 1
         item['file_name'] = vid+'-'+frame
@@ -44,8 +50,8 @@ for vid in videoList:
         item['id'] = imageIndex
         frameMap[videoIndex*10000+i+1] = imageIndex
         images.append(item)
-        shutil.copy2('sequences/'+vid+'/'+frame, 'coco/images/'+vid+'-'+frame)
-    annoFile = open('annotations/'+vid+'.txt')
+        shutil.copy2(dataDir+'sequences/'+vid+'/'+frame, dsDir+'coco/images/'+vid+'-'+frame)
+    annoFile = open(dataDir+'annotations/'+vid+'.txt')
     lines = annoFile.readlines()
     for line in lines:
         # print(line)
@@ -53,7 +59,7 @@ for vid in videoList:
             continue
         anitem = {'segmentations': [[]]}
         nums = [int(x) for x in line.split(',')]
-        if nums[0]%frameStep is not 0:
+        if (nums[0]-1)%frameStep is not 0:
             continue
         anitem['area'] = nums[4]*nums[5]
         anitem['iscrowd'] = 0
